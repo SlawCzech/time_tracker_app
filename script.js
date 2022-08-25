@@ -64,13 +64,35 @@ function renderTask(taskId, title, description, status) {
             )}
     );
 
-
-
     section.appendChild(operationsList);
 
+    const formDiv = document.createElement('div');
+    formDiv.className = 'card-body';
+
+    const form = document.createElement('form');
+    const divInForm = document.createElement('div');
+    divInForm.className = 'input-group';
+    const input = document.createElement('input');
+    input.className = 'form-control';
+    input.setAttribute('type', 'text');
+    input.setAttribute('placeholder', 'Operation description');
+    input.setAttribute('minLength', '5');
+    const divBelowInput = document.createElement('div');
+    divBelowInput.className = 'input-group-append';
+    const buttonInput = document.createElement('button');
+    buttonInput.className = 'btn btn-info';
+    buttonInput.innerText = 'Add';
+    divBelowInput.appendChild(buttonInput);
+    divInForm.appendChild(input);
+    divInForm.appendChild(divBelowInput);
+    form.appendChild(divInForm);
+    formDiv.appendChild(form);
+    section.appendChild(formDiv);
 
 
 }
+
+
 
 function apiListOperationsForTasks(taskId) {
   return fetch(
@@ -144,6 +166,7 @@ function hourlyTime(timeSpent) {
     }
 }
 
+
 document.addEventListener('DOMContentLoaded', function() {
     apiListTasks().then(
         function(response) {
@@ -154,3 +177,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     )
 });
+
+
+document.addEventListener('DOMContentLoaded', function(){
+    const addTaskForm = document.querySelector('form');
+
+    addTaskForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const newTask = addTaskForm.title.value;
+        const newTaskDescription = addTaskForm.description.value;
+        apiCreateTask(newTask, newTaskDescription).then(
+            function(response){
+                renderTask(response.data.id, response.data.title, response.data.description, response.data.status);
+            }
+        )
+    })
+})
+
+
+function apiCreateTask(title, description) {
+  return fetch(
+    apihost + '/api/tasks',
+    {
+      headers: { Authorization: apikey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: title, description: description, status: 'open' }),
+      method: 'POST'
+    }
+  ).then(
+    function(resp) {
+      if(!resp.ok) {
+        alert('Error! Check devtools/Network!');
+      }
+      return resp.json();
+    }
+  )
+}
