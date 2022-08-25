@@ -53,6 +53,12 @@ function renderTask(taskId, title, description, status) {
     deleteButton.innerText = 'Delete';
     headerRightDiv.appendChild(deleteButton);
 
+    deleteButton.addEventListener('click', function(){
+        apiDeleteTask(taskId).then(
+            section.remove()
+        )
+    })
+
     const operationsList = document.createElement('ul');
     operationsList.className = 'list-group list-group-flush';
 
@@ -191,6 +197,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 renderTask(response.data.id, response.data.title, response.data.description, response.data.status);
             }
         )
+        addTaskForm.title.value = '';
+        addTaskForm.description.value = '';
     })
 })
 
@@ -211,4 +219,22 @@ function apiCreateTask(title, description) {
       return resp.json();
     }
   )
+}
+
+function apiDeleteTask(taskId) {
+    return fetch(
+        apihost + '/api/tasks/' + taskId, {
+      headers: { Authorization: apikey },
+      // body: JSON.stringify({ title: title, description: description, status: 'open' }),
+      method: 'DELETE'
+    })
+            .then(
+                function(response) {
+                    if(!response.ok){
+                        alert('Error! Check devtools/Network!')
+                    }
+                    // return response.json()
+                    // console.log('Deleted!!!')
+                }
+            )
 }
