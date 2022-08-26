@@ -1,6 +1,8 @@
 const apikey = '99e5a840-cbc5-401f-a915-59d097f9c0eb';
 const apihost = 'https://todo-api.coderslab.pl';
 
+// Downloads all tasks from api
+
 function apiListTasks() {
   return fetch(
     apihost + '/api/tasks',
@@ -16,6 +18,9 @@ function apiListTasks() {
     }
   )
 }
+
+// Renders HTML DOM with tasks, operations and form for creating new operations
+// all basen on data from api
 
 function renderTask(taskId, title, description, status) {
     const section = document.createElement("section");
@@ -115,6 +120,7 @@ function renderTask(taskId, title, description, status) {
     )
 }
 
+// Fetch for getting operations for a given task
 
 function apiListOperationsForTasks(taskId) {
   return fetch(
@@ -128,10 +134,11 @@ function apiListOperationsForTasks(taskId) {
         alert('Error! Check devtools/Network!');
       }
       return resp.json();
-      // console.log(resp.json());
     }
   )
 }
+
+// Renders HTML DOM for operations details
 
 function renderOperation(operationsList, operationId, status, operationDescription, timeSpent) {
     const li = document.createElement('li');
@@ -191,6 +198,8 @@ function renderOperation(operationsList, operationId, status, operationDescripti
 
 }
 
+// Transforms time from minutes to hours and minutes
+
 function hourlyTime(timeSpent) {
     if (timeSpent === 60){
         return "1h"
@@ -208,6 +217,7 @@ function hourlyTime(timeSpent) {
     }
 }
 
+// Renders tasks after page download
 
 document.addEventListener('DOMContentLoaded', function() {
     apiListTasks().then(
@@ -220,6 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
     )
 });
 
+// Renders form for adding tasks after page download
 
 document.addEventListener('DOMContentLoaded', function(){
     const addTaskForm = document.querySelector('form');
@@ -238,6 +249,7 @@ document.addEventListener('DOMContentLoaded', function(){
     })
 })
 
+// Three fetch functions for creating, deleting and updating tasks
 
 function apiCreateTask(title, description) {
   return fetch(
@@ -290,6 +302,7 @@ function apiUpdateTask(taskId, title, description, status){
   )
 }
 
+// Three fetch functions for creating, deleting and updating operations
 
 function apiCreateOperationForTask(taskId, description){
     return fetch(
@@ -341,3 +354,4 @@ function apiDeleteOperation(operationId){
                 }
             )
 }
+
