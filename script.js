@@ -53,7 +53,8 @@ function renderTask(taskId, title, description, status) {
     deleteButton.innerText = 'Delete';
     headerRightDiv.appendChild(deleteButton);
 
-    deleteButton.addEventListener('click', function(){
+    deleteButton.addEventListener('click', function(event){
+        event.preventDefault();
         apiDeleteTask(taskId).then(
             section.remove()
         )
@@ -95,9 +96,15 @@ function renderTask(taskId, title, description, status) {
     formDiv.appendChild(form);
     section.appendChild(formDiv);
 
-
+    buttonInput.addEventListener('click', function(event) {
+        event.preventDefault();
+        apiCreateOperationForTask(taskId, input.value).then(response =>
+            renderOperation(operationsList, response.data.id, status, response.data.description, response.data.timeSpent)
+        )
+        input.value = '';
+        }
+    )
 }
-
 
 
 function apiListOperationsForTasks(taskId) {
@@ -225,7 +232,6 @@ function apiDeleteTask(taskId) {
     return fetch(
         apihost + '/api/tasks/' + taskId, {
       headers: { Authorization: apikey },
-      // body: JSON.stringify({ title: title, description: description, status: 'open' }),
       method: 'DELETE'
     })
             .then(
@@ -233,8 +239,25 @@ function apiDeleteTask(taskId) {
                     if(!response.ok){
                         alert('Error! Check devtools/Network!')
                     }
-                    // return response.json()
-                    // console.log('Deleted!!!')
                 }
             )
+}
+
+
+function apiCreateOperationForTask(taskId, description){
+    return fetch(
+        apihost + '/api/tasks/' + taskId + '/operations', {
+            headers: { Authorization: apikey, 'Content-Type': 'application/json' },
+            body: JSON.stringify({description: description, timeSpent: 0 }),
+            method: 'POST',
+        }
+    )
+        .then(
+            function(response){
+                if(!response.ok){
+                    alert('Error! Check devtools/Network!')
+                }
+                return response.json()
+            }
+        )
 }
