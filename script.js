@@ -148,15 +148,35 @@ function renderOperation(operationsList, operationId, status, operationDescripti
     quarterButton.innerText = '+15m';
     buttonsRightDiv.appendChild(quarterButton);
 
+    quarterButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        timeSpent = timeSpent + 15;
+        apiUpdateOperation(operationId, operationDescription, timeSpent).then(response =>
+        time.innerText = hourlyTime(response.data.timeSpent))
+        })
+
     const hourButton = document.createElement('button');
     hourButton.className = 'btn btn-outline-success btn-sm mr-2';
     hourButton.innerText = '+1h';
     buttonsRightDiv.appendChild(hourButton);
 
+    hourButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        timeSpent = timeSpent + 60;
+        apiUpdateOperation(operationId, operationDescription, timeSpent).then(response =>
+        time.innerText = hourlyTime(response.data.timeSpent))
+        })
+
     const deleteButton = document.createElement('button');
     deleteButton.className = 'btn btn-outline-danger btn-sm';
     deleteButton.innerText = 'Delete';
     buttonsRightDiv.appendChild(deleteButton);
+
+    deleteButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        apiDeleteOperation(operationId).then(response =>
+        li.remove())
+        })
 
     }
 
@@ -260,4 +280,37 @@ function apiCreateOperationForTask(taskId, description){
                 return response.json()
             }
         )
+}
+
+function apiUpdateOperation(operationId, description, timeSpent){
+    return fetch(
+        apihost + '/api/operations/' + operationId, {
+            headers: { Authorization: apikey, 'Content-Type': 'application/json' },
+            body: JSON.stringify({description: description, timeSpent: timeSpent }),
+            method: 'PUT',
+        }
+    )
+        .then(
+            function(response){
+                if(!response.ok){
+                    alert('Error! Check devtools/Network!')
+                }
+                return response.json()
+            }
+        )
+}
+
+function apiDeleteOperation(operationId){
+    return fetch(
+        apihost + '/api/operations/' + operationId, {
+      headers: { Authorization: apikey },
+      method: 'DELETE'
+    })
+            .then(
+                function(response) {
+                    if(!response.ok){
+                        alert('Error! Check devtools/Network!')
+                    }
+                }
+            )
 }
