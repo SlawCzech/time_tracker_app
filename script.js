@@ -46,6 +46,15 @@ function renderTask(taskId, title, description, status) {
         finishButton.className = 'btn btn-dark btn-sm js-task-open-only';
         finishButton.innerText = 'Finish';
         headerRightDiv.appendChild(finishButton);
+
+        finishButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            apiUpdateTask(taskId, title, description, status).then(
+
+            )
+            const sectionParent = this.parentElement.closest('section');
+            sectionParent.querySelectorAll('.js-task-open-only').forEach(item => item.remove());
+        })
     }
 
     const deleteButton = document.createElement('button');
@@ -65,7 +74,6 @@ function renderTask(taskId, title, description, status) {
 
     apiListOperationsForTasks(taskId).then(
         function(response) {
-            // console.log(response.data)};
             response.data.forEach(
                 function(operation) {renderOperation(operationsList, operation.id, status, operation.description, operation.timeSpent);}
             )}
@@ -74,7 +82,7 @@ function renderTask(taskId, title, description, status) {
     section.appendChild(operationsList);
 
     const formDiv = document.createElement('div');
-    formDiv.className = 'card-body';
+    formDiv.className = 'card-body js-task-open-only';
 
     const form = document.createElement('form');
     const divInForm = document.createElement('div');
@@ -94,8 +102,9 @@ function renderTask(taskId, title, description, status) {
     divInForm.appendChild(divBelowInput);
     form.appendChild(divInForm);
     formDiv.appendChild(form);
-    section.appendChild(formDiv);
-
+    if (status === 'open') {
+        section.appendChild(formDiv);
+    }
     buttonInput.addEventListener('click', function(event) {
         event.preventDefault();
         apiCreateOperationForTask(taskId, input.value).then(response =>
@@ -144,7 +153,7 @@ function renderOperation(operationsList, operationId, status, operationDescripti
 
     if (status === 'open'){
     const quarterButton = document.createElement('button');
-    quarterButton.className = 'btn btn-outline-success btn-sm mr-2';
+    quarterButton.className = 'btn btn-outline-success btn-sm mr-2 js-task-open-only';
     quarterButton.innerText = '+15m';
     buttonsRightDiv.appendChild(quarterButton);
 
@@ -156,7 +165,7 @@ function renderOperation(operationsList, operationId, status, operationDescripti
         })
 
     const hourButton = document.createElement('button');
-    hourButton.className = 'btn btn-outline-success btn-sm mr-2';
+    hourButton.className = 'btn btn-outline-success btn-sm mr-2 js-task-open-only';
     hourButton.innerText = '+1h';
     buttonsRightDiv.appendChild(hourButton);
 
@@ -168,7 +177,7 @@ function renderOperation(operationsList, operationId, status, operationDescripti
         })
 
     const deleteButton = document.createElement('button');
-    deleteButton.className = 'btn btn-outline-danger btn-sm';
+    deleteButton.className = 'btn btn-outline-danger btn-sm js-task-open-only';
     deleteButton.innerText = 'Delete';
     buttonsRightDiv.appendChild(deleteButton);
 
@@ -261,6 +270,24 @@ function apiDeleteTask(taskId) {
                     }
                 }
             )
+}
+
+function apiUpdateTask(taskId, title, description, status){
+    return fetch(
+    apihost + '/api/tasks/' + taskId,
+    {
+      headers: { Authorization: apikey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: title, description: description, status: 'closed' }),
+      method: 'PUT'
+    }
+  ).then(
+    function(resp) {
+      if(!resp.ok) {
+        alert('Error! Check devtools/Network!');
+      }
+      return resp.json();
+    }
+  )
 }
 
 
